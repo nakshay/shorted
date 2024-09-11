@@ -1,0 +1,22 @@
+# Build artifacts
+*.exe
+*.exe~
+*.out
+*.test
+
+# Directory for build output
+/bin/
+/pkg/
+
+# Dependency directories
+/vendor/
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# Environment files
+.env
+
+# Logs
+*.log
