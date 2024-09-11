@@ -5,8 +5,14 @@ import (
 	"shorted/logger"
 )
 
-func main() {
+var db = make(map[string]string)
 
+func main() {
+	r := setupRouter()
+	err := r.Run(":8080")
 	log := logger.New(context.Background())
-	log.Info("Hello Shorted ..")
+	if err != nil {
+		log.Error("Fatal error while starting server")
+	}
+
 }
