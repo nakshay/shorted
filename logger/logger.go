@@ -14,40 +14,38 @@ type Logger interface {
 }
 
 type logger struct {
-	ctx context.Context
+	ctx    context.Context
+	prefix string
 }
 
 func New(ctx context.Context) Logger {
-	return logger{ctx}
+	return logger{ctx: ctx}
 }
 
 func (l logger) WithFields(key, value any) Logger {
-	prefix := log.Prefix()
-	log.SetPrefix(fmt.Sprintf("%v %v: %v ", prefix, key, value))
+	prefix := l.prefix
+	l.prefix = fmt.Sprintf("%v %v: %v ", prefix, key, value)
 	return l
 }
 
 func (l logger) Debug(args ...any) {
-	prefix := log.Prefix()
-	prefix = "DEBUG: " + prefix
+	prefix := fmt.Sprintf("DEBUG : %v - ", l.prefix)
 	logText(prefix, args)
 
 }
 
 func (l logger) Info(args ...any) {
-	prefix := log.Prefix()
-	prefix = "INFO: " + prefix
+	prefix := fmt.Sprintf("INFO : %v - ", l.prefix)
 	logText(prefix, args)
 
 }
 
 func (l logger) Error(args ...any) {
-	prefix := log.Prefix()
-	prefix = "ERROR: " + prefix
+	prefix := fmt.Sprintf("ERROR : %v - ", l.prefix)
 	logText(prefix, args)
 }
 
 func logText(prefix string, args any) {
-	log.SetPrefix(prefix + "- ")
+	log.SetPrefix(prefix)
 	log.Println(args)
 }
