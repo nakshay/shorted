@@ -10,6 +10,9 @@ type Logger interface {
 	Debug(args ...any)
 	Info(args ...any)
 	Error(args ...any)
+	Debugf(format string, args ...any)
+	Infof(format string, args ...any)
+	Errorf(format string, args ...any)
 	WithFields(key, value any) Logger
 }
 
@@ -43,6 +46,23 @@ func (l logger) Info(args ...any) {
 func (l logger) Error(args ...any) {
 	prefix := fmt.Sprintf("ERROR : %v - ", l.prefix)
 	logText(prefix, args)
+}
+
+func (l logger) Debugf(format string, args ...any) {
+	prefix := fmt.Sprintf("DEBUG : %v - ", l.prefix)
+	logText(prefix, fmt.Sprintf(format, args))
+
+}
+
+func (l logger) Infof(format string, args ...any) {
+	prefix := fmt.Sprintf("INFO : %v - ", l.prefix)
+	logText(prefix, fmt.Sprintf(format, args))
+
+}
+
+func (l logger) Errorf(format string, args ...any) {
+	prefix := fmt.Sprintf("ERROR : %v - ", l.prefix)
+	logText(prefix, fmt.Sprintf(format, args))
 }
 
 func logText(prefix string, args any) {
