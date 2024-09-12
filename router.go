@@ -7,7 +7,7 @@ import (
 	"shorted/controller"
 	shortedErr "shorted/error"
 	urlShortenerService "shorted/service"
-	"shorted/store"
+	"shorted/storage"
 )
 
 func setupRouter(config *configuration.ConfigData) *gin.Engine {
@@ -19,7 +19,7 @@ func setupRouter(config *configuration.ConfigData) *gin.Engine {
 	})
 
 	// initialization
-	dbStore := store.Init()
+	dbStore := storage.Init()
 
 	errorResponseInterceptor := shortedErr.NewErrorResponseInterceptor()
 

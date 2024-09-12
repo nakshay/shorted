@@ -1,7 +1,6 @@
-package store
+package storage
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -46,12 +45,6 @@ func (s *store) FindFullURL(shortURL string) (string, bool) {
 	s.updateVisit(fullURL)
 	return fullURL, true
 }
-func (s *store) IsShortURLExists(fullURL string) (string, bool) {
-	s.visitorMutex.RLock()
-	defer s.visitorMutex.RUnlock()
-	v, found := s.visitorMap[fullURL]
-	return v.shortUrl, found
-}
 
 func (s *store) updateVisit(fullURL string) {
 	s.visitorMutex.Lock()
@@ -61,9 +54,15 @@ func (s *store) updateVisit(fullURL string) {
 	s.visitorMap[fullURL] = v
 }
 
+func (s *store) IsShortURLExists(fullURL string) (string, bool) {
+	s.visitorMutex.RLock()
+	defer s.visitorMutex.RUnlock()
+	v, found := s.visitorMap[fullURL]
+	return v.shortUrl, found
+}
+
 func (s *store) addVisitor(fullURL string, shortURL string) {
 	s.visitorMutex.Lock()
 	defer s.visitorMutex.Unlock()
 	s.visitorMap[fullURL] = visitor{0, shortURL}
-	fmt.Printf("Visitors till now : \n %v", s.visitorMap)
 }

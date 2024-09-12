@@ -8,7 +8,7 @@ import (
 	shortedErr "shorted/error"
 	"shorted/loggingUtil"
 	"shorted/model"
-	"shorted/store"
+	"shorted/storage"
 	"time"
 )
 
@@ -18,11 +18,11 @@ type URLShortenerService interface {
 }
 
 type urlShortenerService struct {
-	store      store.Store
+	store      storage.Store
 	configData *configuration.ConfigData
 }
 
-func NewURLShortenerService(store store.Store,
+func NewURLShortenerService(store storage.Store,
 	configData *configuration.ConfigData) URLShortenerService {
 	return urlShortenerService{store: store, configData: configData}
 }
