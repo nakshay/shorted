@@ -33,5 +33,7 @@ func setupRouter(config *configuration.ConfigData) *gin.Engine {
 		routes.POST("/v1/short-it", urlShortenerController.GetShortenedURL)
 	}
 
+	r.GET("/:shortURL", redirectController.RedirectToFullUrl)
+
 	return r
 }

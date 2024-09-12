@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	shortedErr "shorted/error"
-	"shorted/logger"
+	"shorted/loggingUtil"
 	"shorted/model"
 	"shorted/service"
 )
@@ -24,7 +24,7 @@ func NewURLShortenerController(service service.URLShortenerService,
 }
 
 func (controller urlShortenerController) GetShortenedURL(ctx *gin.Context) {
-	log := logger.New(ctx).WithFields("Controller", "urlShortenerController").WithFields("Method", "GetShortenedURL")
+	log := loggingUtil.GetLogger(ctx).WithFields("Controller", "urlShortenerController").WithFields("Method", "GetShortenedURL")
 	log.Info("URL shortening started")
 	var request model.ShortURLRequest
 	err := ctx.Bind(&request)
@@ -39,6 +39,6 @@ func (controller urlShortenerController) GetShortenedURL(ctx *gin.Context) {
 		controller.errorResponseInterceptor.HandleServiceErr(ctx, serviceErr)
 		return
 	}
-	ctx.JSON(http.StatusOK, shortenedURL)
 	log.Info("URL shortening request received")
+	ctx.JSON(http.StatusOK, shortenedURL)
 }
