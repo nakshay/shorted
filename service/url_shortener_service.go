@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"shorted/configuration"
 	shortedErr "shorted/error"
-	"shorted/logger"
+	"shorted/loggingUtil"
 	"shorted/model"
 	"shorted/store"
 	"time"
@@ -27,20 +27,30 @@ func NewURLShortenerService(store store.Store,
 }
 
 func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL string) (model.ShortUrlResponse, *shortedErr.ShortedError) {
-	log := logger.New(ctx).
-		WithFields("Service", "urlShortenerService").
+	logger := loggingUtil.GetLogger(ctx).
+		WithFields("File", "urlShortenerService").
 		WithFields("Method", "GetShortenedURL")
 
-	shortUrl := generateRandomString(10) //make length configurable
-	err := service.store.Save(shortUrl, fullURL)
+	logger.Debugf("Checking if short url exist for full url %v", fullURL)
+	shortUrl, found := service.store.IsShortURLExists(fullURL)
+	if found {
+		logger.Info("Short url found")
+		return service.buildResponse(shortUrl), nil
+	}
+
+	shortUrl = generateRandomString(10) //make length configurable
+	err := service.store.SaveShortURL(shortUrl, fullURL)
 	if err != nil {
-		log.Error("Error while saving short url ", err)
+		logger.Error("Error while saving short url ", err)
 		return model.ShortUrlResponse{}, shortedErr.InternalServerErrorWithMessage(err.Error())
 	}
+	return service.buildResponse(shortUrl), nil
+
+}
+
+func (service urlShortenerService) buildResponse(shortUrl string) model.ShortUrlResponse {
 	shortUrl = fmt.Sprintf("%v/%v", service.configData.ServiceDomain, shortUrl)
-
-	return model.ShortUrlResponse{ShortUrl: shortUrl}, nil
-
+	return model.ShortUrlResponse{ShortUrl: shortUrl}
 }
 
 func generateRandomString(length int) string {

@@ -1,4 +1,4 @@
-package logger
+package loggingUtil
 
 import (
 	"context"
@@ -21,7 +21,7 @@ type logger struct {
 	prefix string
 }
 
-func New(ctx context.Context) Logger {
+func GetLogger(ctx context.Context) Logger {
 	return logger{ctx: ctx}
 }
 

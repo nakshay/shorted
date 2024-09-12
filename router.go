@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"shorted/configuration"
-	shortContrller "shorted/controller"
+	"shorted/controller"
 	shortedErr "shorted/error"
 	urlShortenerService "shorted/service"
 	"shorted/store"
@@ -19,12 +19,14 @@ func setupRouter(config *configuration.ConfigData) *gin.Engine {
 	})
 
 	// initialization
-	s := store.Init()
+	dbStore := store.Init()
 
 	errorResponseInterceptor := shortedErr.NewErrorResponseInterceptor()
 
-	shortenerService := urlShortenerService.NewURLShortenerService(s, config)
-	urlShortenerController := shortContrller.NewURLShortenerController(shortenerService, errorResponseInterceptor)
+	shortenerService := urlShortenerService.NewURLShortenerService(dbStore, config)
+	urlShortenerController := controller.NewURLShortenerController(shortenerService, errorResponseInterceptor)
+
+	redirectController := controller.NewRedirectController(shortenerService, errorResponseInterceptor)
 
 	routes := r.Group("/api")
 	{
