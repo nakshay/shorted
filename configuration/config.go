@@ -5,6 +5,11 @@ import (
 	"os"
 )
 
+type ConfigData struct {
+	ServiceDomain         string `json:"service_domain"`
+	RandomCharacterLength int    `json:"random_char_length"`
+}
+
 type ConfigLoader interface {
 	LoadConfig(file string) (*ConfigData, error)
 }
@@ -24,8 +29,4 @@ func (c configLoader) LoadConfig(filePath string) (*ConfigData, error) {
 	decoder := json.NewDecoder(file)
 	err = decoder.Decode(&configuration)
 	return &configuration, err
-}
-
-type ConfigData struct {
-	ServiceDomain string `json:"service_domain"`
 }

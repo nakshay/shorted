@@ -39,7 +39,7 @@ func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL str
 		return service.buildResponse(shortUrl), nil
 	}
 
-	shortUrl = generateRandomString(10) //make length configurable
+	shortUrl = generateRandomString(service.configData.RandomCharacterLength)
 	err := service.store.SaveShortURL(shortUrl, fullURL)
 	if err != nil {
 		logger.Error("Error while saving short url ", err)

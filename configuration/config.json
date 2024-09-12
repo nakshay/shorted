@@ -1,3 +1,4 @@
 {
-  "service_domain": "http://localhost:8080"
+  "service_domain": "http://localhost:8080",
+  "random_char_length" : 15
 }
