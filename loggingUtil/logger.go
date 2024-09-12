@@ -50,19 +50,19 @@ func (l logger) Error(args ...any) {
 
 func (l logger) Debugf(format string, args ...any) {
 	prefix := fmt.Sprintf("DEBUG : %v - ", l.prefix)
-	logText(prefix, fmt.Sprintf(format, args))
+	logText(prefix, fmt.Sprintf(format, args...))
 
 }
 
 func (l logger) Infof(format string, args ...any) {
 	prefix := fmt.Sprintf("INFO : %v - ", l.prefix)
-	logText(prefix, fmt.Sprintf(format, args))
+	logText(prefix, fmt.Sprintf(format, args...))
 
 }
 
 func (l logger) Errorf(format string, args ...any) {
 	prefix := fmt.Sprintf("ERROR : %v - ", l.prefix)
-	logText(prefix, fmt.Sprintf(format, args))
+	logText(prefix, fmt.Sprintf(format, args...))
 }
 
 func logText(prefix string, args any) {
