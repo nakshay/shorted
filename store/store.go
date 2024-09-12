@@ -1,43 +1,69 @@
 package store
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 type Store interface {
-	Save(key string, value string) error
-	Read(key string) (string, bool)
-	isExist(key string) bool
+	SaveShortURL(key string, value string) error
+	FindFullURL(key string) (string, bool)
+	IsShortURLExists(key string) (string, bool)
 }
 
 type store struct {
-	db      map[string]string
-	visitor map[string]int
-	mutex   sync.RWMutex
+	db           map[string]string
+	visitorMap   map[string]visitor
+	dbMutex      sync.RWMutex
+	visitorMutex sync.RWMutex
+}
+
+type visitor struct {
+	visitorCount int
+	shortUrl     string
 }
 
 func Init() Store {
-	return &store{db: map[string]string{}, visitor: map[string]int{}}
+	return &store{db: map[string]string{}, visitorMap: map[string]visitor{}}
 }
 
-func (s *store) Save(key string, value string) error {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	s.db[key] = value
-	s.visitor[value] = 0
+func (s *store) SaveShortURL(shortURL string, fullURL string) error {
+	s.dbMutex.Lock()
+	s.db[shortURL] = fullURL
+	s.dbMutex.Unlock()
+
+	s.addVisitor(fullURL, shortURL)
 	return nil
 }
 
-func (s *store) Read(key string) (string, bool) {
-	s.mutex.RLock()
-	s.mutex.RUnlock()
-	value, found := s.db[key]
+func (s *store) FindFullURL(shortURL string) (string, bool) {
+	s.dbMutex.RLock()
+	fullURL, found := s.db[shortURL]
+	s.dbMutex.RUnlock()
 	if !found {
 		return "", false
 	}
-	return value, true
+	s.updateVisit(fullURL)
+	return fullURL, true
 }
-func (s *store) isExist(key string) bool {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
-	_, found := s.visitor[key]
-	return found
+func (s *store) IsShortURLExists(fullURL string) (string, bool) {
+	s.visitorMutex.RLock()
+	defer s.visitorMutex.RUnlock()
+	v, found := s.visitorMap[fullURL]
+	return v.shortUrl, found
+}
+
+func (s *store) updateVisit(fullURL string) {
+	s.visitorMutex.Lock()
+	defer s.visitorMutex.Unlock()
+	v, _ := s.visitorMap[fullURL]
+	v.visitorCount++
+	s.visitorMap[fullURL] = v
+}
+
+func (s *store) addVisitor(fullURL string, shortURL string) {
+	s.visitorMutex.Lock()
+	defer s.visitorMutex.Unlock()
+	s.visitorMap[fullURL] = visitor{0, shortURL}
+	fmt.Printf("Visitors till now : \n %v", s.visitorMap)
 }
