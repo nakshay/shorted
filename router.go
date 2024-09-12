@@ -3,10 +3,14 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"shorted/configuration"
 	shortContrller "shorted/controller"
+	shortedErr "shorted/error"
+	urlShortenerService "shorted/service"
+	"shorted/store"
 )
 
-func setupRouter() *gin.Engine {
+func setupRouter(config *configuration.ConfigData) *gin.Engine {
 
 	r := gin.Default()
 	// Health endpoint
@@ -15,12 +19,16 @@ func setupRouter() *gin.Engine {
 	})
 
 	// initialization
+	s := store.Init()
 
-	urlShortnerController := shortContrller.NewURLShortenerController()
+	errorResponseInterceptor := shortedErr.NewErrorResponseInterceptor()
+
+	shortenerService := urlShortenerService.NewURLShortenerService(s, config)
+	urlShortenerController := shortContrller.NewURLShortenerController(shortenerService, errorResponseInterceptor)
 
 	routes := r.Group("/api")
 	{
-		routes.POST("/v1/short-it", urlShortnerController.GetShortenedURL)
+		routes.POST("/v1/short-it", urlShortenerController.GetShortenedURL)
 	}
 
 	return r
