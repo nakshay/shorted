@@ -34,12 +34,7 @@ func (controller urlShortenerController) GetShortenedURL(ctx *gin.Context) {
 		controller.errorResponseInterceptor.HandleBadRequest(ctx, err)
 		return
 	}
-	shortenedURL, serviceErr := controller.service.GetShortenedURL(ctx, request.URL)
-	if serviceErr != nil {
-		log.Errorf("Error recieved from service: Error %v", serviceErr)
-		controller.errorResponseInterceptor.HandleServiceErr(ctx, serviceErr)
-		return
-	}
+	shortenedURL := controller.service.GetShortenedURL(ctx, request.URL)
 	log.Info("URL shortening request received")
 	ctx.JSON(http.StatusOK, shortenedURL)
 }

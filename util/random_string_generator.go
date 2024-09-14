@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+//go:generate mockgen -source=./random_string_generator.go -destination=../mocks/mock_random_string_generator.go -package=mocks
+
 type RandomStringGenerator interface {
 	GenerateRandomString(length int) string
 }

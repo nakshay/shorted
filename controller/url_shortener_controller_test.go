@@ -11,7 +11,6 @@ import (
 	"net/http/httptest"
 	"shorted/mocks"
 	"shorted/model"
-	shortedErr "shorted/shorted_error"
 	"testing"
 )
 
@@ -50,7 +49,7 @@ func (suite *UrlShortenerControllerTestSuite) TestURLShortenerShouldReturnShortU
 	requestBytes, _ := json.Marshal(request)
 	suite.context.Request = httptest.NewRequest("POST", "/api/v1/short-it",
 		bytes.NewBufferString(string(requestBytes)))
-	suite.mockURLShortenerService.EXPECT().GetShortenedURL(suite.context, longURL).Return(expectedResponse, nil)
+	suite.mockURLShortenerService.EXPECT().GetShortenedURL(suite.context, longURL).Return(expectedResponse)
 
 	suite.controller.GetShortenedURL(suite.context)
 	responseBytes, _ := io.ReadAll(suite.recorder.Body)
@@ -69,25 +68,6 @@ func (suite *UrlShortenerControllerTestSuite) TestURLShortenerShouldReturnBadReq
 	_ = json.Unmarshal(responseBytes, &actualResponse)
 	suite.mockErrorResponseInterceptor.EXPECT().HandleBadRequest(suite.context, gomock.Any())
 	suite.controller.GetShortenedURL(suite.context)
-	suite.Empty(actualResponse)
-
-}
-
-func (suite *UrlShortenerControllerTestSuite) TestURLShortenerShouldReturnErrorIfServiceCallReturnsError() {
-	longURL := "long-url"
-	request := model.ShortURLRequest{URL: longURL}
-	expectedErr := shortedErr.InternalServerError()
-	requestBytes, _ := json.Marshal(request)
-	suite.context.Request = httptest.NewRequest("POST", "/api/v1/short-it",
-		bytes.NewBufferString(string(requestBytes)))
-	suite.mockURLShortenerService.EXPECT().GetShortenedURL(suite.context, longURL).Return(model.ShortUrlResponse{}, expectedErr)
-	suite.mockErrorResponseInterceptor.EXPECT().HandleServiceErr(suite.context, expectedErr)
-	suite.controller.GetShortenedURL(suite.context)
-
-	responseBytes, _ := io.ReadAll(suite.recorder.Body)
-	var actualResponse model.ShortUrlResponse
-	_ = json.Unmarshal(responseBytes, &actualResponse)
-
 	suite.Empty(actualResponse)
 
 }

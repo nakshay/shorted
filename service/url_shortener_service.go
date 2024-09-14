@@ -14,7 +14,7 @@ import (
 //go:generate mockgen -source=./url_shortener_service.go -destination=../mocks/mock_url_shortener_service.go -package=mocks
 
 type URLShortenerService interface {
-	GetShortenedURL(ctx *gin.Context, url string) (model.ShortUrlResponse, *shortedErr.ShortedError)
+	GetShortenedURL(ctx *gin.Context, url string) model.ShortUrlResponse
 	GetFullURL(ctx *gin.Context, url string) (string, *shortedErr.ShortedError)
 }
 
@@ -30,7 +30,7 @@ func NewURLShortenerService(store storage.Store,
 	return urlShortenerService{store: store, configData: configData, randomStringGenerator: randomStringGenerator}
 }
 
-func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL string) (model.ShortUrlResponse, *shortedErr.ShortedError) {
+func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL string) model.ShortUrlResponse {
 	logger := loggingUtil.GetLogger(ctx).
 		WithFields("File", "urlShortenerService").
 		WithFields("Method", "GetShortenedURL")
@@ -39,16 +39,12 @@ func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL str
 	shortUrl, found := service.store.IsShortURLExists(fullURL)
 	if found {
 		logger.Info("Short url found")
-		return service.buildResponse(shortUrl), nil
+		return service.buildResponse(shortUrl)
 	}
-
+	logger.Info("Short URL not found, generating a new one")
 	shortUrl = service.randomStringGenerator.GenerateRandomString(service.configData.RandomCharacterLength)
-	err := service.store.SaveShortURL(shortUrl, fullURL)
-	if err != nil {
-		logger.Error("Error while saving short url ", err)
-		return model.ShortUrlResponse{}, shortedErr.InternalServerErrorWithMessage(err.Error())
-	}
-	return service.buildResponse(shortUrl), nil
+	service.store.SaveShortURL(shortUrl, fullURL)
+	return service.buildResponse(shortUrl)
 
 }
 
