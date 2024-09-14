@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"shorted/configuration"
 	"shorted/controller"
-	shortedErr "shorted/error"
 	urlShortenerService "shorted/service"
+	shortedErr "shorted/shorted_error"
 	"shorted/storage"
 )
 

@@ -1,4 +1,4 @@
-package error
+package shorted_error
 
 import "fmt"
 

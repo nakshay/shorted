@@ -5,12 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"math/rand"
 	"shorted/configuration"
-	shortedErr "shorted/error"
 	"shorted/loggingUtil"
 	"shorted/model"
+	shortedErr "shorted/shorted_error"
 	"shorted/storage"
 	"time"
 )
+
+//go:generate mockgen -source=./url_shortener_service.go -destination=../mocks/mock_url_shortener_service.go -package=mocks
 
 type URLShortenerService interface {
 	GetShortenedURL(ctx *gin.Context, url string) (model.ShortUrlResponse, *shortedErr.ShortedError)

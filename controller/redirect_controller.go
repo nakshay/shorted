@@ -3,9 +3,9 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	shortedErr "shorted/error"
 	"shorted/loggingUtil"
 	urlShortenerService "shorted/service"
+	shortedErr "shorted/shorted_error"
 )
 
 type RedirectController interface {

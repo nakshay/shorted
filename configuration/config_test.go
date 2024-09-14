@@ -14,7 +14,7 @@ type ConfigDataTestSuite struct {
 func TestConfigDataTestSuite(t *testing.T) {
 	suite.Run(t, new(ConfigDataTestSuite))
 }
-func (suite *ConfigDataTestSuite) SetupSuite() {
+func (suite *ConfigDataTestSuite) SetupTest() {
 	suite.configLoader = NewConfigLoader()
 	var err error
 	suite.configData, err = suite.configLoader.LoadConfig("./config.json")
