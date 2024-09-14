@@ -7,6 +7,8 @@ import (
 	"shorted/storage"
 )
 
+//go:generate mockgen -source=./redirect_service.go -destination=../mocks/mock_redirect_service.go -package=mocks
+
 type RedirectService interface {
 	GetFullURL(ctx *gin.Context, url string) (string, *shortedErr.ShortedError)
 }
