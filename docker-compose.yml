@@ -1,0 +1,12 @@
+services:
+
+  shorted:
+    image: shorted
+    build:
+      context: .
+      dockerfile: infrastructure/Dockerfile
+    ports:
+      - "8080:8080"
+    command: ["./shorted"]
+
+
