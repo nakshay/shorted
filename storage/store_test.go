@@ -7,12 +7,11 @@ import (
 
 func TestSaveShortURL_ShouldSuccessfullySaveShortURL(t *testing.T) {
 	s := Init()
-	err := s.SaveShortURL("short-url", "full-url")
+	s.SaveShortURL("short-url", "full-url")
 
 	store := s.(*store)
 	_, found := store.db["short-url"]
 
-	assert.Nil(t, err)
 	assert.True(t, found)
 	assert.Equal(t, store.db["short-url"], "full-url")
 }

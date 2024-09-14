@@ -4,8 +4,10 @@ import (
 	"sync"
 )
 
+//go:generate mockgen -source=./store.go -destination=../mocks/mock_store.go -package=mocks
+
 type Store interface {
-	SaveShortURL(key string, value string) error
+	SaveShortURL(key string, value string)
 	FindFullURL(key string) (string, bool)
 	IsShortURLExists(key string) (string, bool)
 }
@@ -26,10 +28,9 @@ func Init() Store {
 	return &store{db: map[string]string{}, visitorMap: map[string]visitor{}}
 }
 
-func (s *store) SaveShortURL(shortURL string, fullURL string) error {
+func (s *store) SaveShortURL(shortURL string, fullURL string) {
 	s.saveShortURL(shortURL, fullURL)
 	s.addVisitor(fullURL, shortURL)
-	return nil
 }
 
 func (s *store) saveShortURL(shortURL, fullURL string) {
