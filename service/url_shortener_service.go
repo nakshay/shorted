@@ -42,6 +42,7 @@ func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL str
 	logger.Info("Short URL not found, generating a new one")
 	shortUrl = service.randomStringGenerator.GenerateRandomString(service.configData.RandomCharacterLength)
 	service.store.SaveShortURL(shortUrl, fullURL)
+	logger.Info("Short url created")
 	return service.buildResponse(shortUrl)
 
 }

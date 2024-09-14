@@ -4,6 +4,7 @@
 *.out
 *.test
 
+shorted
 # Directory for build output
 /bin/
 /pkg/

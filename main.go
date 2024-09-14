@@ -11,12 +11,13 @@ func main() {
 	if err != nil {
 		panic("Error while reading configuration file")
 	}
-	log := loggingUtil.GetLogger(context.Background())
+	logger := loggingUtil.GetLogger(context.Background())
+	logger.Info("Starting shorted service")
 	r := setupRouter(config)
 	err = r.Run(":8080")
 
 	if err != nil {
-		log.Error("Fatal error while starting server")
+		logger.Error("Fatal error while starting server")
 	}
 
 }

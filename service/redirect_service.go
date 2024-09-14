@@ -29,8 +29,10 @@ func (service redirectService) GetFullURL(ctx *gin.Context, shortUrl string) (st
 	logger.Infof("Started finding full url for a short url %v", shortUrl)
 	fullURL, found := service.store.FindFullURL(shortUrl)
 	if !found {
-		return "", shortedErr.URLNotFoundErr
+		err := shortedErr.URLNotFoundErr
+		logger.Errorf("URL not found. Error %v", err)
+		return "", err
 	}
-
+	logger.Info("URL found for given short URL")
 	return fullURL, nil
 }
