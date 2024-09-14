@@ -6,7 +6,6 @@ import (
 	"shorted/configuration"
 	"shorted/loggingUtil"
 	"shorted/model"
-	shortedErr "shorted/shorted_error"
 	"shorted/storage"
 	"shorted/util"
 )
@@ -15,7 +14,6 @@ import (
 
 type URLShortenerService interface {
 	GetShortenedURL(ctx *gin.Context, url string) model.ShortUrlResponse
-	GetFullURL(ctx *gin.Context, url string) (string, *shortedErr.ShortedError)
 }
 
 type urlShortenerService struct {
@@ -51,18 +49,4 @@ func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL str
 func (service urlShortenerService) buildResponse(shortUrl string) model.ShortUrlResponse {
 	shortUrl = fmt.Sprintf("%v/%v", service.configData.ServiceDomain, shortUrl)
 	return model.ShortUrlResponse{ShortUrl: shortUrl}
-}
-
-func (service urlShortenerService) GetFullURL(ctx *gin.Context, shortUrl string) (string, *shortedErr.ShortedError) {
-	logger := loggingUtil.GetLogger(ctx).
-		WithFields("File", "urlShortenerService").
-		WithFields("Method", "GetFullURL")
-
-	logger.Infof("Started finding full url for a short url %v", shortUrl)
-	fullURL, found := service.store.FindFullURL(shortUrl)
-	if !found {
-		return "", shortedErr.URLNotFoundErr
-	}
-
-	return fullURL, nil
 }

@@ -8,7 +8,6 @@ import (
 	"shorted/configuration"
 	"shorted/mocks"
 	"shorted/model"
-	"shorted/shorted_error"
 	"testing"
 )
 
@@ -60,22 +59,4 @@ func (suite *UrlShortenerServiceTestSuite) TestNewUrlShortenerServiceShouldRetur
 	suite.mockStore.EXPECT().IsShortURLExists(longURL).Return(randomString, true)
 	response := suite.urlShortenerService.GetShortenedURL(suite.context, longURL)
 	suite.Equal(expectedResponse, response)
-}
-
-func (suite *UrlShortenerServiceTestSuite) TestGetFullURLShouldReturnFullURLForGivenShortURLIfExists() {
-	shortURL := "short-url"
-	fullURL := "https://google.com/iamfellinggood"
-	suite.mockStore.EXPECT().FindFullURL(shortURL).Return(fullURL, true)
-	response, err := suite.urlShortenerService.GetFullURL(suite.context, shortURL)
-	suite.Nil(err)
-	suite.Equal(fullURL, response)
-}
-
-func (suite *UrlShortenerServiceTestSuite) TestGetFullURLShouldReturnErrorIfURLDoesNotExists() {
-	shortURL := "short-url"
-	expectedErr := shorted_error.URLNotFoundErr
-	suite.mockStore.EXPECT().FindFullURL(shortURL).Return("", false)
-	response, err := suite.urlShortenerService.GetFullURL(suite.context, shortURL)
-	suite.Equal(expectedErr, err)
-	suite.Empty(response)
 }

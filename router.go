@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"shorted/configuration"
 	"shorted/controller"
-	urlShortenerService "shorted/service"
+	"shorted/service"
 	shortedErr "shorted/shorted_error"
 	"shorted/storage"
 	"shorted/util"
@@ -24,10 +24,11 @@ func setupRouter(config *configuration.ConfigData) *gin.Engine {
 
 	errorResponseInterceptor := shortedErr.NewErrorResponseInterceptor()
 	randomStringGenerator := util.NewRandomStringGenerator()
-	shortenerService := urlShortenerService.NewURLShortenerService(dbStore, config, randomStringGenerator)
+	shortenerService := service.NewURLShortenerService(dbStore, config, randomStringGenerator)
+	redirectService := service.NewRedirectService(dbStore)
 	urlShortenerController := controller.NewURLShortenerController(shortenerService, errorResponseInterceptor)
 
-	redirectController := controller.NewRedirectController(shortenerService, errorResponseInterceptor)
+	redirectController := controller.NewRedirectController(redirectService, errorResponseInterceptor)
 
 	routes := r.Group("/api")
 	{

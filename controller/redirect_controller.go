@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"shorted/loggingUtil"
-	urlShortenerService "shorted/service"
+	"shorted/service"
 	shortedErr "shorted/shorted_error"
 )
 
@@ -13,13 +13,13 @@ type RedirectController interface {
 }
 
 type redirectController struct {
-	urlShortenerService      urlShortenerService.URLShortenerService
+	redirectService          service.RedirectService
 	errorResponseInterceptor shortedErr.ErrorResponseInterceptor
 }
 
-func NewRedirectController(urlShortenerService urlShortenerService.URLShortenerService,
+func NewRedirectController(urlShortenerService service.RedirectService,
 	errorResponseInterceptor shortedErr.ErrorResponseInterceptor) RedirectController {
-	return redirectController{urlShortenerService: urlShortenerService, errorResponseInterceptor: errorResponseInterceptor}
+	return redirectController{redirectService: urlShortenerService, errorResponseInterceptor: errorResponseInterceptor}
 }
 
 func (c redirectController) RedirectToFullUrl(ctx *gin.Context) {
@@ -28,7 +28,7 @@ func (c redirectController) RedirectToFullUrl(ctx *gin.Context) {
 
 	shortURL := ctx.Param("shortURL")
 	logger.Infof("Received a short url %v", shortURL)
-	fullUrl, err := c.urlShortenerService.GetFullURL(ctx, shortURL)
+	fullUrl, err := c.redirectService.GetFullURL(ctx, shortURL)
 	if err != nil {
 		logger.Errorf("Failed to get full url: %v", err)
 		c.errorResponseInterceptor.HandleServiceErr(ctx, err)
