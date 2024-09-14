@@ -1,9 +1,11 @@
-package error
+package shorted_error
 
 import (
 	"github.com/gin-gonic/gin"
 	"shorted/loggingUtil"
 )
+
+//go:generate mockgen -source=./error_response_interceptor.go -destination=../mocks/mock_error_response_interceptor.go -package=mocks
 
 type ErrorResponseInterceptor interface {
 	HandleBadRequest(ctx *gin.Context, bindErr error)
@@ -26,7 +28,7 @@ func (errorResponseInterceptor) HandleBadRequest(ctx *gin.Context, bindErr error
 
 func (errorResponseInterceptor) HandleServiceErr(ctx *gin.Context, serviceErr *ShortedError) {
 	log := loggingUtil.GetLogger(ctx).WithFields("File", "errorResponseInterceptor").WithFields("Method", "HandleServiceErr")
-	log.Errorf("Service error %v", serviceErr)
+	log.Errorf("Service shorted_error %v", serviceErr)
 	ctx.JSON(serviceErr.httpStatusCode, serviceErr.errorMessage)
 
 }

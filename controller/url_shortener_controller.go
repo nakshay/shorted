@@ -2,11 +2,12 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"net/http"
-	shortedErr "shorted/error"
 	"shorted/loggingUtil"
 	"shorted/model"
 	"shorted/service"
+	shortedErr "shorted/shorted_error"
 )
 
 type URLShortenerController interface {
@@ -27,7 +28,7 @@ func (controller urlShortenerController) GetShortenedURL(ctx *gin.Context) {
 	log := loggingUtil.GetLogger(ctx).WithFields("Controller", "urlShortenerController").WithFields("Method", "GetShortenedURL")
 	log.Info("URL shortening started")
 	var request model.ShortURLRequest
-	err := ctx.Bind(&request)
+	err := ctx.ShouldBindBodyWith(&request, binding.JSON)
 	if err != nil {
 		log.Errorf("Error while binding request %v", err)
 		controller.errorResponseInterceptor.HandleBadRequest(ctx, err)
