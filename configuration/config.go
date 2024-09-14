@@ -21,12 +21,12 @@ func NewConfigLoader() ConfigLoader {
 }
 
 func (c configLoader) LoadConfig(filePath string) (*ConfigData, error) {
-	configuration := ConfigData{}
+	configuration := &ConfigData{}
 	file, err := os.Open(filePath)
 	if err != nil {
-		return &configuration, err
+		return configuration, err
 	}
 	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&configuration)
-	return &configuration, err
+	err = decoder.Decode(configuration)
+	return configuration, err
 }
