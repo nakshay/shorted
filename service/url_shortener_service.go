@@ -3,13 +3,12 @@ package service
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"math/rand"
 	"shorted/configuration"
 	"shorted/loggingUtil"
 	"shorted/model"
 	shortedErr "shorted/shorted_error"
 	"shorted/storage"
-	"time"
+	"shorted/util"
 )
 
 //go:generate mockgen -source=./url_shortener_service.go -destination=../mocks/mock_url_shortener_service.go -package=mocks
@@ -20,13 +19,15 @@ type URLShortenerService interface {
 }
 
 type urlShortenerService struct {
-	store      storage.Store
-	configData *configuration.ConfigData
+	store                 storage.Store
+	configData            *configuration.ConfigData
+	randomStringGenerator util.RandomStringGenerator
 }
 
 func NewURLShortenerService(store storage.Store,
-	configData *configuration.ConfigData) URLShortenerService {
-	return urlShortenerService{store: store, configData: configData}
+	configData *configuration.ConfigData,
+	randomStringGenerator util.RandomStringGenerator) URLShortenerService {
+	return urlShortenerService{store: store, configData: configData, randomStringGenerator: randomStringGenerator}
 }
 
 func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL string) (model.ShortUrlResponse, *shortedErr.ShortedError) {
@@ -41,7 +42,7 @@ func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL str
 		return service.buildResponse(shortUrl), nil
 	}
 
-	shortUrl = generateRandomString(service.configData.RandomCharacterLength)
+	shortUrl = service.randomStringGenerator.GenerateRandomString(service.configData.RandomCharacterLength)
 	err := service.store.SaveShortURL(shortUrl, fullURL)
 	if err != nil {
 		logger.Error("Error while saving short url ", err)
@@ -54,20 +55,6 @@ func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL str
 func (service urlShortenerService) buildResponse(shortUrl string) model.ShortUrlResponse {
 	shortUrl = fmt.Sprintf("%v/%v", service.configData.ServiceDomain, shortUrl)
 	return model.ShortUrlResponse{ShortUrl: shortUrl}
-}
-
-func generateRandomString(length int) string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	var result []byte
-	for i := 0; i < length; i++ {
-		randomIndex := r.Intn(length)
-		result = append(result, charset[randomIndex])
-	}
-
-	return string(result)
-
 }
 
 func (service urlShortenerService) GetFullURL(ctx *gin.Context, shortUrl string) (string, *shortedErr.ShortedError) {

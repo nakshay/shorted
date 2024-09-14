@@ -8,6 +8,7 @@ import (
 	urlShortenerService "shorted/service"
 	shortedErr "shorted/shorted_error"
 	"shorted/storage"
+	"shorted/util"
 )
 
 func setupRouter(config *configuration.ConfigData) *gin.Engine {
@@ -22,8 +23,8 @@ func setupRouter(config *configuration.ConfigData) *gin.Engine {
 	dbStore := storage.Init()
 
 	errorResponseInterceptor := shortedErr.NewErrorResponseInterceptor()
-
-	shortenerService := urlShortenerService.NewURLShortenerService(dbStore, config)
+	randomStringGenerator := util.NewRandomStringGenerator()
+	shortenerService := urlShortenerService.NewURLShortenerService(dbStore, config, randomStringGenerator)
 	urlShortenerController := controller.NewURLShortenerController(shortenerService, errorResponseInterceptor)
 
 	redirectController := controller.NewRedirectController(shortenerService, errorResponseInterceptor)
