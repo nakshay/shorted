@@ -28,4 +28,5 @@ func (suite *ConfigDataTestSuite) TestShouldLoadConfigFromFile() {
 
 	suite.Equal(15, suite.configData.RandomCharacterLength)
 	suite.Equal("http://localhost:8080", suite.configData.ServiceDomain)
+	suite.Equal(3, suite.configData.MetricDefaultSize)
 }

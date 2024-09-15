@@ -41,7 +41,7 @@ func (suite *MetricsServiceTestSuite) TestGetMetricsShouldReturnMetricsSuccessfu
 		URL:  "domain3.com",
 		Hits: 1,
 	}}}
-	suite.mockStore.EXPECT().GetMetricsForTopDomain(gomock.Any()).Return(expectedResponse)
-	respnse := suite.metricsService.GetMetrics(suite.context)
-	suite.Equal(expectedResponse, respnse)
+	suite.mockStore.EXPECT().GetMetricsForTopDomain(3).Return(expectedResponse)
+	response := suite.metricsService.GetMetrics(suite.context, 3)
+	suite.Equal(expectedResponse, response)
 }

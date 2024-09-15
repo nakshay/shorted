@@ -3,8 +3,10 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"shorted/configuration"
 	"shorted/loggingUtil"
 	"shorted/service"
+	"strconv"
 )
 
 type MetricController interface {
@@ -13,16 +15,18 @@ type MetricController interface {
 
 type metricController struct {
 	metricService service.MetricsService
+	configData    *configuration.ConfigData
 }
 
-func NewMetricController(metricService service.MetricsService) MetricController {
-	return metricController{metricService: metricService}
+func NewMetricController(metricService service.MetricsService, configData *configuration.ConfigData) MetricController {
+	return metricController{metricService: metricService, configData: configData}
 }
 
-func (c metricController) GetMetrics(ctx *gin.Context) {
+func (controller metricController) GetMetrics(ctx *gin.Context) {
 	logger := loggingUtil.GetLogger(ctx).WithFields("File", "metricController").WithFields("Method", "GetMetrics")
 	logger.Infof("Getting top hits ")
-	response := c.metricService.GetMetrics(ctx)
+	topNDomains, _ := strconv.Atoi(ctx.DefaultQuery("limit", strconv.Itoa(controller.configData.MetricDefaultSize)))
+	response := controller.metricService.GetMetrics(ctx, topNDomains)
 	logger.Debugf("Read metrics successful")
 	ctx.JSON(http.StatusOK, response)
 

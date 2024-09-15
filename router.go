@@ -31,7 +31,7 @@ func setupRouter(config *configuration.ConfigData) *gin.Engine {
 
 	urlShortenerController := controller.NewURLShortenerController(shortenerService, errorResponseInterceptor)
 	redirectController := controller.NewRedirectController(redirectService, errorResponseInterceptor)
-	metricsController := controller.NewMetricController(metricService)
+	metricsController := controller.NewMetricController(metricService, config)
 
 	routes := r.Group("/api")
 	{

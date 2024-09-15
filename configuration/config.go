@@ -8,6 +8,7 @@ import (
 type ConfigData struct {
 	ServiceDomain         string `json:"service_domain"`
 	RandomCharacterLength int    `json:"random_char_length"`
+	MetricDefaultSize     int    `json:"metric_default_size"`
 }
 
 type ConfigLoader interface {
