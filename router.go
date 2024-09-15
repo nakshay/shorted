@@ -24,15 +24,19 @@ func setupRouter(config *configuration.ConfigData) *gin.Engine {
 
 	errorResponseInterceptor := shortedErr.NewErrorResponseInterceptor()
 	randomStringGenerator := util.NewRandomStringGenerator()
+
 	shortenerService := service.NewURLShortenerService(dbStore, config, randomStringGenerator)
 	redirectService := service.NewRedirectService(dbStore)
-	urlShortenerController := controller.NewURLShortenerController(shortenerService, errorResponseInterceptor)
+	metricService := service.NewMetricsService(dbStore)
 
+	urlShortenerController := controller.NewURLShortenerController(shortenerService, errorResponseInterceptor)
 	redirectController := controller.NewRedirectController(redirectService, errorResponseInterceptor)
+	metricsController := controller.NewMetricController(metricService)
 
 	routes := r.Group("/api")
 	{
 		routes.POST("/v1/short-it", urlShortenerController.GetShortenedURL)
+		routes.GET("/v1/metrics", metricsController.GetMetrics)
 	}
 
 	r.GET("/:shortURL", redirectController.RedirectToFullUrl)

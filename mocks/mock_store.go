@@ -6,6 +6,7 @@ package mocks
 
 import (
 	reflect "reflect"
+	model "shorted/model"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -34,43 +35,69 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 }
 
 // FindFullURL mocks base method.
-func (m *MockStore) FindFullURL(key string) (string, bool) {
+func (m *MockStore) FindFullURL(shortURL string) (string, bool) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindFullURL", key)
+	ret := m.ctrl.Call(m, "FindFullURL", shortURL)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(bool)
 	return ret0, ret1
 }
 
 // FindFullURL indicates an expected call of FindFullURL.
-func (mr *MockStoreMockRecorder) FindFullURL(key interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) FindFullURL(shortURL interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindFullURL", reflect.TypeOf((*MockStore)(nil).FindFullURL), key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindFullURL", reflect.TypeOf((*MockStore)(nil).FindFullURL), shortURL)
 }
 
-// IsShortURLExists mocks base method.
-func (m *MockStore) IsShortURLExistsForFullURL(key string) (string, bool) {
+// GetMetricsForTopDomain mocks base method.
+func (m *MockStore) GetMetricsForTopDomain(topNDomains int) model.MetricsResponse {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsShortURLExistsForFullURL", key)
+	ret := m.ctrl.Call(m, "GetMetricsForTopDomain", topNDomains)
+	ret0, _ := ret[0].(model.MetricsResponse)
+	return ret0
+}
+
+// GetMetricsForTopDomain indicates an expected call of GetMetricsForTopDomain.
+func (mr *MockStoreMockRecorder) GetMetricsForTopDomain(topNDomains interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetricsForTopDomain", reflect.TypeOf((*MockStore)(nil).GetMetricsForTopDomain), topNDomains)
+}
+
+// IsShortURLExistsForFullURL mocks base method.
+func (m *MockStore) IsShortURLExistsForFullURL(fullURL string) (string, bool) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsShortURLExistsForFullURL", fullURL)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(bool)
 	return ret0, ret1
 }
 
-// IsShortURLExists indicates an expected call of IsShortURLExists.
-func (mr *MockStoreMockRecorder) IsShortURLExists(key interface{}) *gomock.Call {
+// IsShortURLExistsForFullURL indicates an expected call of IsShortURLExistsForFullURL.
+func (mr *MockStoreMockRecorder) IsShortURLExistsForFullURL(fullURL interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsShortURLExistsForFullURL", reflect.TypeOf((*MockStore)(nil).IsShortURLExistsForFullURL), key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsShortURLExistsForFullURL", reflect.TypeOf((*MockStore)(nil).IsShortURLExistsForFullURL), fullURL)
 }
 
 // SaveShortURL mocks base method.
-func (m *MockStore) SaveShortURL(key, value string) {
+func (m *MockStore) SaveShortURL(shortURL, fullURL string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SaveShortURL", key, value)
+	m.ctrl.Call(m, "SaveShortURL", shortURL, fullURL)
 }
 
 // SaveShortURL indicates an expected call of SaveShortURL.
-func (mr *MockStoreMockRecorder) SaveShortURL(key, value interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) SaveShortURL(shortURL, fullURL interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveShortURL", reflect.TypeOf((*MockStore)(nil).SaveShortURL), key, value)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveShortURL", reflect.TypeOf((*MockStore)(nil).SaveShortURL), shortURL, fullURL)
+}
+
+// UpdateMetricsForDomain mocks base method.
+func (m *MockStore) UpdateMetricsForDomain(domain string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UpdateMetricsForDomain", domain)
+}
+
+// UpdateMetricsForDomain indicates an expected call of UpdateMetricsForDomain.
+func (mr *MockStoreMockRecorder) UpdateMetricsForDomain(domain interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMetricsForDomain", reflect.TypeOf((*MockStore)(nil).UpdateMetricsForDomain), domain)
 }

@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"shorted/model"
+	"sort"
 	"sync"
 )
 
@@ -10,6 +12,8 @@ type Store interface {
 	SaveShortURL(shortURL string, fullURL string)
 	FindFullURL(shortURL string) (string, bool)
 	IsShortURLExistsForFullURL(fullURL string) (string, bool)
+	UpdateMetricsForDomain(domain string)
+	GetMetricsForTopDomain(topNDomains int) model.MetricsResponse
 }
 
 type store struct {
@@ -17,10 +21,16 @@ type store struct {
 	shortToFullRWMutex sync.RWMutex
 	fullToShortMap     map[string]string
 	fullToShortRMutex  sync.RWMutex
+	metricsMap         map[string]int
+	metricsRWMutex     sync.RWMutex
 }
 
 func Init() Store {
-	return &store{shortToFullMap: map[string]string{}, fullToShortMap: map[string]string{}}
+	return &store{
+		shortToFullMap: map[string]string{},
+		fullToShortMap: map[string]string{},
+		metricsMap:     make(map[string]int),
+	}
 }
 
 func (s *store) SaveShortURL(shortURL string, fullURL string) {
@@ -51,4 +61,38 @@ func (s *store) IsShortURLExistsForFullURL(fullURL string) (string, bool) {
 	defer s.fullToShortRMutex.RUnlock()
 	shortURL, found := s.fullToShortMap[fullURL]
 	return shortURL, found
+}
+
+func (s *store) UpdateMetricsForDomain(domain string) {
+	s.metricsRWMutex.Lock()
+	defer s.metricsRWMutex.Unlock()
+	s.metricsMap[domain]++
+}
+
+func (s *store) GetMetricsForTopDomain(topNDomains int) model.MetricsResponse {
+	type mapEntry struct {
+		domain string
+		count  int
+	}
+	var topHits []model.TopHit
+
+	s.metricsRWMutex.RLock()
+	defer s.metricsRWMutex.RUnlock()
+
+	for domain, count := range s.metricsMap {
+		topHits = append(topHits, model.TopHit{URL: domain, Hits: count})
+	}
+	sort.Slice(topHits, func(i, j int) bool {
+		return topHits[i].Hits > topHits[j].Hits
+	})
+
+	if len(topHits) < topNDomains {
+		return model.MetricsResponse{
+			TopHits: topHits,
+		}
+	}
+	topHits = topHits[:topNDomains]
+	return model.MetricsResponse{
+		TopHits: topHits,
+	}
 }

@@ -42,21 +42,23 @@ func (suite *UrlShortenerServiceTestSuite) TearDownTest() {
 }
 
 func (suite *UrlShortenerServiceTestSuite) TestNewUrlShortenerServiceShouldGenerateNewShortURLIfAlreadyNotPresent() {
-	longURL := "long-url"
+	longURL := "http://long-url.com"
 	randomString := "ajsidpfidncjdur"
 	expectedResponse := model.ShortUrlResponse{ShortUrl: suite.configData.ServiceDomain + "/" + randomString}
-	suite.mockStore.EXPECT().IsShortURLExists(longURL).Return("", false)
+	suite.mockStore.EXPECT().IsShortURLExistsForFullURL(longURL).Return("", false)
 	suite.mockRandomStringGenerator.EXPECT().GenerateRandomString(suite.configData.RandomCharacterLength).Return(randomString)
 	suite.mockStore.EXPECT().SaveShortURL(randomString, longURL)
+	suite.mockStore.EXPECT().UpdateMetricsForDomain("long-url.com")
 	response := suite.urlShortenerService.GetShortenedURL(suite.context, longURL)
 	suite.Equal(expectedResponse, response)
 }
 
 func (suite *UrlShortenerServiceTestSuite) TestNewUrlShortenerServiceShouldReturnResponseIfShortURLAlreadyExist() {
-	longURL := "long-url"
+	longURL := "http://long-url.com"
 	randomString := "ajsidpfidncjdur"
 	expectedResponse := model.ShortUrlResponse{ShortUrl: suite.configData.ServiceDomain + "/" + randomString}
-	suite.mockStore.EXPECT().IsShortURLExists(longURL).Return(randomString, true)
+	suite.mockStore.EXPECT().IsShortURLExistsForFullURL(longURL).Return(randomString, true)
+	suite.mockStore.EXPECT().UpdateMetricsForDomain("long-url.com")
 	response := suite.urlShortenerService.GetShortenedURL(suite.context, longURL)
 	suite.Equal(expectedResponse, response)
 }

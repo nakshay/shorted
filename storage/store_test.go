@@ -2,6 +2,7 @@ package storage
 
 import (
 	"github.com/stretchr/testify/assert"
+	"shorted/model"
 	"testing"
 )
 
@@ -63,4 +64,75 @@ func TestIsShortURLExistsShouldReturnFalseIfURLExists(t *testing.T) {
 	assert.False(t, found)
 	assert.Equal(t, "", shortURL)
 
+}
+
+func TestUpdateMetricsForDomainShouldUpdateDomainMetricsToOneIfCalledFirstTime(t *testing.T) {
+	s := Init()
+	s.UpdateMetricsForDomain("domain.com")
+	store := s.(*store)
+	assert.Equal(t, store.metricsMap["domain.com"], 1)
+
+}
+
+func TestUpdateMetricsForDomainShouldUpdateDomainMetricsToTwoIfCalledSecondTimeTime(t *testing.T) {
+	s := Init()
+	s.UpdateMetricsForDomain("domain.com")
+	s.UpdateMetricsForDomain("domain.com")
+	store := s.(*store)
+	assert.Equal(t, store.metricsMap["domain.com"], 2)
+
+}
+
+func TestGetMetricsForTopDomainShouldReturnMetrics(t *testing.T) {
+	s := Init()
+	expectedResponse := model.MetricsResponse{TopHits: []model.TopHit{{
+		URL:  "domain.com",
+		Hits: 2,
+	}}}
+	s.UpdateMetricsForDomain("domain.com")
+	s.UpdateMetricsForDomain("domain.com")
+	response := s.GetMetricsForTopDomain(1)
+	assert.Equal(t, expectedResponse, response)
+}
+
+func TestGetMetricsForTopDomainShouldReturnMaxNMetricsIfNIsPassed(t *testing.T) {
+	s := Init()
+	expectedResponse := model.MetricsResponse{TopHits: []model.TopHit{{
+		URL:  "domain2.com",
+		Hits: 3,
+	}, {
+		URL:  "domain1.com",
+		Hits: 1,
+	}}}
+	s.UpdateMetricsForDomain("domain1.com")
+	s.UpdateMetricsForDomain("domain2.com")
+	s.UpdateMetricsForDomain("domain2.com")
+	s.UpdateMetricsForDomain("domain2.com")
+
+	response := s.GetMetricsForTopDomain(5)
+	assert.Equal(t, expectedResponse, response)
+}
+
+func TestGetMetricsForTopDomainShouldReturnAllMetricsIfRecordsAreLessThanN(t *testing.T) {
+	s := Init()
+	expectedResponse := model.MetricsResponse{TopHits: []model.TopHit{{
+		URL:  "domain4.com",
+		Hits: 4,
+	}, {
+		URL:  "domain2.com",
+		Hits: 3,
+	}}}
+	s.UpdateMetricsForDomain("domain1.com")
+	s.UpdateMetricsForDomain("domain2.com")
+	s.UpdateMetricsForDomain("domain2.com")
+	s.UpdateMetricsForDomain("domain2.com")
+	s.UpdateMetricsForDomain("domain3.com")
+	s.UpdateMetricsForDomain("domain3.com")
+	s.UpdateMetricsForDomain("domain4.com")
+	s.UpdateMetricsForDomain("domain4.com")
+	s.UpdateMetricsForDomain("domain4.com")
+	s.UpdateMetricsForDomain("domain4.com")
+
+	response := s.GetMetricsForTopDomain(2)
+	assert.Equal(t, expectedResponse, response)
 }

@@ -3,11 +3,13 @@ package service
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/url"
 	"shorted/configuration"
 	"shorted/loggingUtil"
 	"shorted/model"
 	"shorted/storage"
 	"shorted/util"
+	"strings"
 )
 
 //go:generate mockgen -source=./url_shortener_service.go -destination=../mocks/mock_url_shortener_service.go -package=mocks
@@ -35,7 +37,9 @@ func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL str
 
 	defer func() {
 		logger.Debugf("Updating visitor count for the URL %v", fullURL)
-
+		parsedURL, _ := url.ParseRequestURI(fullURL)
+		service.store.UpdateMetricsForDomain(strings.Split(parsedURL.Host, ":")[0])
+		logger.Info("Updated visitor count for the URL")
 	}()
 
 	logger.Infof("Checking if short url exist for full url %v", fullURL)
