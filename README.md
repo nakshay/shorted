@@ -26,7 +26,7 @@ shorted: In memory URL shortener
 
 ### To run docker image without cloning, run below docker command
 
-```docker run -p 8080:8080  nakshayondocker/shorted```
+```docker run -p 8080:8080 nakshayondocker/shorted```
 
 #### use postman collection to know about available APIs inside ```postman_collections``` folder
 
