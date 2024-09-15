@@ -22,6 +22,7 @@ type logger struct {
 }
 
 func GetLogger(ctx context.Context) Logger {
+	// optimization: use context to save logger object to avoid recreation of logger object
 	return logger{ctx: ctx}
 }
 

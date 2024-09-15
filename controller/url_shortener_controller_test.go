@@ -43,7 +43,7 @@ func (suite *UrlShortenerControllerTestSuite) TearDownTest() {
 }
 
 func (suite *UrlShortenerControllerTestSuite) TestURLShortenerShouldReturnShortURLSuccessfully() {
-	longURL := "long-url"
+	longURL := "https://long-url"
 	request := model.ShortURLRequest{URL: longURL}
 	expectedResponse := model.ShortUrlResponse{ShortUrl: "short-url"}
 	requestBytes, _ := json.Marshal(request)
@@ -69,5 +69,18 @@ func (suite *UrlShortenerControllerTestSuite) TestURLShortenerShouldReturnBadReq
 	suite.mockErrorResponseInterceptor.EXPECT().HandleBadRequest(suite.context, gomock.Any())
 	suite.controller.GetShortenedURL(suite.context)
 	suite.Empty(actualResponse)
+
+}
+
+func (suite *UrlShortenerControllerTestSuite) TestURLShortenerShouldReturnBadRequestErrorURLIsNotValid() {
+
+	longURL := "long-url"
+	request := model.ShortURLRequest{URL: longURL}
+	requestBytes, _ := json.Marshal(request)
+	suite.context.Request = httptest.NewRequest("POST", "/api/v1/short-it",
+		bytes.NewBufferString(string(requestBytes)))
+
+	suite.mockErrorResponseInterceptor.EXPECT().HandleBadRequest(suite.context, gomock.Any())
+	suite.controller.GetShortenedURL(suite.context)
 
 }

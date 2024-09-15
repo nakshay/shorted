@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"net/http"
+	"net/url"
 	"shorted/loggingUtil"
 	"shorted/model"
 	"shorted/service"
@@ -31,6 +32,12 @@ func (controller urlShortenerController) GetShortenedURL(ctx *gin.Context) {
 	err := ctx.ShouldBindBodyWith(&request, binding.JSON)
 	if err != nil {
 		log.Errorf("Error while binding request %v", err)
+		controller.errorResponseInterceptor.HandleBadRequest(ctx, err)
+		return
+	}
+	if _, parsedErr := url.ParseRequestURI(request.URL); parsedErr != nil {
+		log.Errorf("Error while parsing url %v, %v", request.URL, parsedErr)
+		err := shortedErr.BadRequestErrorWithErrorMessage(parsedErr.Error())
 		controller.errorResponseInterceptor.HandleBadRequest(ctx, err)
 		return
 	}
