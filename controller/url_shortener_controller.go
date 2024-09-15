@@ -26,7 +26,7 @@ func NewURLShortenerController(service service.URLShortenerService,
 }
 
 func (controller urlShortenerController) GetShortenedURL(ctx *gin.Context) {
-	log := loggingUtil.GetLogger(ctx).WithFields("Controller", "urlShortenerController").WithFields("Method", "GetShortenedURL")
+	log := loggingUtil.GetLogger(ctx).WithFields("file", "urlShortenerController").WithFields("Method", "GetShortenedURL")
 	log.Info("URL shortening started")
 	var request model.ShortURLRequest
 	err := ctx.ShouldBindBodyWith(&request, binding.JSON)
