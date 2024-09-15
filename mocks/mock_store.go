@@ -49,9 +49,9 @@ func (mr *MockStoreMockRecorder) FindFullURL(key interface{}) *gomock.Call {
 }
 
 // IsShortURLExists mocks base method.
-func (m *MockStore) IsShortURLExists(key string) (string, bool) {
+func (m *MockStore) IsShortURLExistsForFullURL(key string) (string, bool) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsShortURLExists", key)
+	ret := m.ctrl.Call(m, "IsShortURLExistsForFullURL", key)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(bool)
 	return ret0, ret1
@@ -60,7 +60,7 @@ func (m *MockStore) IsShortURLExists(key string) (string, bool) {
 // IsShortURLExists indicates an expected call of IsShortURLExists.
 func (mr *MockStoreMockRecorder) IsShortURLExists(key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsShortURLExists", reflect.TypeOf((*MockStore)(nil).IsShortURLExists), key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsShortURLExistsForFullURL", reflect.TypeOf((*MockStore)(nil).IsShortURLExistsForFullURL), key)
 }
 
 // SaveShortURL mocks base method.

@@ -7,9 +7,9 @@ import (
 //go:generate mockgen -source=./store.go -destination=../mocks/mock_store.go -package=mocks
 
 type Store interface {
-	SaveShortURL(key string, value string)
-	FindFullURL(key string) (string, bool)
-	IsShortURLExists(key string) (string, bool)
+	SaveShortURL(shortURL string, fullURL string)
+	FindFullURL(shortURL string) (string, bool)
+	IsShortURLExistsForFullURL(fullURL string) (string, bool)
 }
 
 type store struct {
@@ -46,7 +46,7 @@ func (s *store) FindFullURL(shortURL string) (string, bool) {
 	return fullURL, found
 }
 
-func (s *store) IsShortURLExists(fullURL string) (string, bool) {
+func (s *store) IsShortURLExistsForFullURL(fullURL string) (string, bool) {
 	s.fullToShortRMutex.RLock()
 	defer s.fullToShortRMutex.RUnlock()
 	shortURL, found := s.fullToShortMap[fullURL]

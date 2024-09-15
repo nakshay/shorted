@@ -49,7 +49,7 @@ func TestIsShortURLExistsShouldReturnTrueIfURLExists(t *testing.T) {
 	s := Init()
 	store := s.(*store)
 	store.fullToShortMap["full-url"] = "short-url"
-	shortURL, found := s.IsShortURLExists("full-url")
+	shortURL, found := s.IsShortURLExistsForFullURL("full-url")
 
 	assert.True(t, found)
 	assert.Equal(t, "short-url", shortURL)
@@ -58,7 +58,7 @@ func TestIsShortURLExistsShouldReturnTrueIfURLExists(t *testing.T) {
 
 func TestIsShortURLExistsShouldReturnFalseIfURLExists(t *testing.T) {
 	s := Init()
-	shortURL, found := s.IsShortURLExists("full-url")
+	shortURL, found := s.IsShortURLExistsForFullURL("full-url")
 
 	assert.False(t, found)
 	assert.Equal(t, "", shortURL)
