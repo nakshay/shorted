@@ -28,6 +28,8 @@ shorted: In memory URL shortener
 
 ```docker run -p 8080:8080  nakshayondocker/shorted```
 
+#### use postman collection to know about available APIs inside ```postman_collections``` folder
+
 ### Makefile Rule
 
 ##### Run test: 
