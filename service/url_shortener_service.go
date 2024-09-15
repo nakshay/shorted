@@ -33,7 +33,11 @@ func (service urlShortenerService) GetShortenedURL(ctx *gin.Context, fullURL str
 		WithFields("File", "urlShortenerService").
 		WithFields("Method", "GetShortenedURL")
 
-	logger.Debugf("Checking if short url exist for full url %v", fullURL)
+	defer func() {
+		logger.Debugf("Updating visitor count for the URL %v", fullURL)
+	}()
+
+	logger.Infof("Checking if short url exist for full url %v", fullURL)
 	shortUrl, found := service.store.IsShortURLExists(fullURL)
 	if found {
 		logger.Info("Short url found")

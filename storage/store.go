@@ -13,67 +13,42 @@ type Store interface {
 }
 
 type store struct {
-	db           map[string]string
-	visitorMap   map[string]visitor
-	dbMutex      sync.RWMutex
-	visitorMutex sync.RWMutex
-}
-
-type visitor struct {
-	visitorCount int
-	shortUrl     string
+	shortToFullMap     map[string]string
+	shortToFullRWMutex sync.RWMutex
+	fullToShortMap     map[string]string
+	fullToShortRMutex  sync.RWMutex
 }
 
 func Init() Store {
-	return &store{db: map[string]string{}, visitorMap: map[string]visitor{}}
+	return &store{shortToFullMap: map[string]string{}, fullToShortMap: map[string]string{}}
 }
 
 func (s *store) SaveShortURL(shortURL string, fullURL string) {
-	s.saveShortURL(shortURL, fullURL)
-	s.addVisitor(fullURL, shortURL)
+	s.mapShortToFullURL(shortURL, fullURL)
+	s.mapFullToShortURL(fullURL, shortURL)
 }
 
-func (s *store) saveShortURL(shortURL, fullURL string) {
-	s.dbMutex.Lock()
-	defer s.dbMutex.Unlock()
-	s.db[shortURL] = fullURL
+func (s *store) mapShortToFullURL(shortURL string, fullURL string) {
+	s.shortToFullRWMutex.Lock()
+	defer s.shortToFullRWMutex.Unlock()
+	s.shortToFullMap[shortURL] = fullURL
 }
-
-func (s *store) addVisitor(fullURL string, shortURL string) {
-	s.visitorMutex.Lock()
-	defer s.visitorMutex.Unlock()
-	s.visitorMap[fullURL] = visitor{0, shortURL}
+func (s *store) mapFullToShortURL(fullURL string, shortURL string) {
+	s.fullToShortRMutex.Lock()
+	defer s.fullToShortRMutex.Unlock()
+	s.fullToShortMap[fullURL] = shortURL
 }
 
 func (s *store) FindFullURL(shortURL string) (string, bool) {
-	fullURL, found := s.findFullURL(shortURL)
-	if !found {
-		return "", false
-	}
-	s.updateVisit(fullURL)
-	return fullURL, true
-}
-
-func (s *store) findFullURL(shortURL string) (string, bool) {
-	s.dbMutex.RLock()
-	defer s.dbMutex.RUnlock()
-
-	fullURL, found := s.db[shortURL]
+	s.shortToFullRWMutex.RLock()
+	defer s.shortToFullRWMutex.RUnlock()
+	fullURL, found := s.shortToFullMap[shortURL]
 	return fullURL, found
-
-}
-
-func (s *store) updateVisit(fullURL string) {
-	s.visitorMutex.Lock()
-	defer s.visitorMutex.Unlock()
-	v, _ := s.visitorMap[fullURL]
-	v.visitorCount++
-	s.visitorMap[fullURL] = v
 }
 
 func (s *store) IsShortURLExists(fullURL string) (string, bool) {
-	s.visitorMutex.RLock()
-	defer s.visitorMutex.RUnlock()
-	v, found := s.visitorMap[fullURL]
-	return v.shortUrl, found
+	s.fullToShortRMutex.RLock()
+	defer s.fullToShortRMutex.RUnlock()
+	shortURL, found := s.fullToShortMap[fullURL]
+	return shortURL, found
 }

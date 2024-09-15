@@ -10,16 +10,29 @@ func TestSaveShortURL_ShouldSuccessfullySaveShortURL(t *testing.T) {
 	s.SaveShortURL("short-url", "full-url")
 
 	store := s.(*store)
-	_, found := store.db["short-url"]
+	_, found := store.shortToFullMap["short-url"]
 
 	assert.True(t, found)
-	assert.Equal(t, store.db["short-url"], "full-url")
+	assert.Equal(t, store.shortToFullMap["short-url"], "full-url")
+}
+
+func TestSaveShortURL_ShouldNotStoreSameURLAgain(t *testing.T) {
+	s := Init()
+	s.SaveShortURL("short-url", "full-url")
+	s.SaveShortURL("short-url", "full-url")
+
+	store := s.(*store)
+	_, found := store.shortToFullMap["short-url"]
+
+	assert.True(t, found)
+	assert.Equal(t, store.shortToFullMap["short-url"], "full-url")
+	assert.Equal(t, 1, len(store.shortToFullMap))
 }
 
 func TestFindFullURLShouldReturnFullURLIfPresent(t *testing.T) {
 	s := Init()
 	store := s.(*store)
-	store.db["short-url"] = "full-url"
+	store.shortToFullMap["short-url"] = "full-url"
 	fullURL, found := s.FindFullURL("short-url")
 	assert.True(t, found)
 	assert.Equal(t, "full-url", fullURL)
@@ -35,10 +48,7 @@ func TestFindFullURLShouldReturnFalseWhenURLNotPresent(t *testing.T) {
 func TestIsShortURLExistsShouldReturnTrueIfURLExists(t *testing.T) {
 	s := Init()
 	store := s.(*store)
-	store.visitorMap["full-url"] = visitor{
-		visitorCount: 0,
-		shortUrl:     "short-url",
-	}
+	store.fullToShortMap["full-url"] = "short-url"
 	shortURL, found := s.IsShortURLExists("full-url")
 
 	assert.True(t, found)
