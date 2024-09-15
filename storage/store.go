@@ -70,14 +70,14 @@ func (s *store) UpdateMetricsForDomain(domain string) {
 }
 
 func (s *store) GetMetricsForTopDomain(topNDomains int) model.MetricsResponse {
-	type mapEntry struct {
-		domain string
-		count  int
-	}
 	var topHits []model.TopHit
 
 	s.metricsRWMutex.RLock()
 	defer s.metricsRWMutex.RUnlock()
+
+	if len(s.metricsMap) < 1 {
+		return model.MetricsResponse{TopHits: make([]model.TopHit, 0)}
+	}
 
 	for domain, count := range s.metricsMap {
 		topHits = append(topHits, model.TopHit{URL: domain, Hits: count})
